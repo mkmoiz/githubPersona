@@ -28,6 +28,11 @@ classifiers = [
 ]
 dependencies = []
 
+[project.urls]
+Homepage = "https://github.com/mkmoiz/githubPersona"
+Repository = "https://github.com/mkmoiz/githubPersona"
+"Issue Tracker" = "https://github.com/mkmoiz/githubPersona/issues"
+
 [project.scripts]
 gitpersona = "app:main"
 

@@ -27,6 +27,24 @@ Managing multiple GitHub accounts (Work, Personal, Open Source, Clients) on a si
 
 ---
 
+## 💡 Why I Built This & Why I Use It (Author's Note)
+
+> *"I originally built this tool out of sheer necessity for my own daily engineering work.
+> 
+> Like many developers, I manage multiple GitHub accounts on a single workstation—my day job/work repositories, personal open-source projects, and client codebases. Constantly switching between them was an absolute headache:
+> - I would accidentally push corporate commits with my personal email, or personal commits with my work email.
+> - Juggling multiple SSH keys inevitably caused `Permission denied (publickey)` errors at the worst possible times.
+> - Commits would show up as **Unverified** on GitHub because GPG/SSH commit signing wasn't configured per-identity.
+> - Manually editing global `.gitconfig` or `.ssh/config` was tedious and fragile.
+>
+> I built **GitPersona** to solve these exact problems once and for all. It lets me pin identities directly to repositories so I never commit under the wrong email again, verify SSH connections before pushing, and sign every commit cleanly.
+>
+> **It is 100% free and open source.** Since it completely streamlined my workflow and saved me countless hours of config debugging, I'm publishing it so other developers facing the same multi-account pain can use it too."*
+> 
+> — **Moiz Khan** ([@mkmoiz](https://github.com/mkmoiz))
+
+---
+
 ## ✨ Features
 
 - **⚡ 1-Click Identity Switching**: Updates global `user.name`, `user.email`, and `core.sshCommand` together atomically.
@@ -49,8 +67,8 @@ Managing multiple GitHub accounts (Work, Personal, Open Source, Clients) on a si
 
 ### Option A: Install globally (Recommended)
 ```sh
-git clone https://github.com/mkmoiz/gitpersona.git
-cd gitpersona
+git clone https://github.com/mkmoiz/githubPersona.git
+cd githubPersona
 ./scripts/install.sh
 ```
 This creates:
@@ -148,6 +166,6 @@ All tests execute in isolated temporary environments and never modify your perso
 
 ## 📄 License
 
-Distributed under the [MIT License](LICENSE).
+Distributed under the [MIT License](LICENSE). 100% Free and Open Source.
 
 Created with care by **Moiz Khan** ([@mkmoiz](https://github.com/mkmoiz)).
