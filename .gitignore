@@ -1,0 +1,18 @@
+# Local runtime data & profile storage (contains backups and profiles)
+.data/
+
+# Python cache & packaging
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+.venv/
+venv/
+
+# Editor and temporary files
+*.swp
+*~
+*.bak
+.DS_Store

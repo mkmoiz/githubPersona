@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#f6f7f3">
+  <title>GitPersona · Your Git identities, in sync</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="/" aria-label="GitPersona home"><img src="/favicon.svg" alt="" width="38" height="38"><span>git<span class="brand-light">persona</span><small>YOUR LOCAL IDENTITY HUB</small></span></a>
+    <div class="workspace"><span class="workspace-avatar">LO</span><div>Local workspace<small><span class="dot"></span> On this computer</small></div><span class="workspace-chevron">⌄</span></div>
+    <div class="nav-label">WORKSPACE</div>
+    <nav aria-label="Main navigation">
+      <button class="nav-item selected" data-view="accounts"><span data-icon="accounts"></span>Accounts<span class="nav-count" id="account-count">0</span></button>
+      <button class="nav-item" data-view="repos"><span data-icon="folder"></span>Repositories<span class="nav-count" id="repo-count">0</span></button>
+      <button class="nav-item" data-view="keys"><span data-icon="key"></span>SSH keys<span class="nav-count" id="key-count">0</span></button>
+      <button class="nav-item" data-view="backups"><span data-icon="history"></span>Switch history<span class="nav-count" id="backup-count">0</span></button>
+      <button class="nav-item" data-view="guide"><span data-icon="book"></span>How it works<span data-icon="arrow-up-right" class="nav-arrow"></span></button>
+    </nav>
+    <div class="sidebar-bottom"><div class="local-note"><span data-icon="shield"></span><strong>Local by design.</strong><p>Your keys stay on your machine.<br>Your identities stay in your control.</p></div><div class="sidebar-footer"><span class="dot"></span> Local app <span>v1.1</span></div></div>
+  </aside>
+  <div class="app-shell">
+    <header class="topbar"><div class="breadcrumbs">Workspace <span>/</span> <strong id="breadcrumb">Accounts</strong></div><div class="topbar-right"><span class="local-pill"><span class="dot"></span> LOCAL ONLY</span><span class="top-avatar" title="Local workspace">LO</span></div></header>
+    <main>
+      <div class="page-heading"><div><div class="eyebrow">A LITTLE LESS CONFIG. A LOT MORE FLOW.</div><h1 id="page-title">The right identity.<br>Every time.</h1><p id="page-description">All your GitHub accounts, one place. Switch and get back to building.</p></div><div class="heading-actions"><button class="button secondary" id="generate-key"><span data-icon="key"></span>Generate SSH key</button><button class="button primary" id="add-account"><span data-icon="plus"></span>Add account</button></div></div>
+      <div class="error-banner" id="connection-error" role="alert" hidden></div>
+      <section id="accounts-view">
+        <section class="identity-panel" aria-labelledby="identity-heading">
+          <div class="identity-main"><div class="identity-topline"><span class="section-kicker"><span class="status-dot"></span> CURRENT GLOBAL IDENTITY</span><span class="status-chip" id="identity-status">Checking…</span></div><div class="identity-person"><div class="identity-avatar" id="identity-avatar"><span data-icon="git"></span></div><div><h2 id="identity-heading">Reading your Git config…</h2><p id="identity-email">Your current identity will appear here.</p></div></div><div class="identity-bottom"><span data-icon="globe"></span><span id="identity-caption">Read directly from your global Git configuration</span></div></div>
+          <div class="identity-config"><div class="config-heading"><span>LIVE CONFIGURATION</span><span data-icon="terminal"></span></div><dl><div><dt>user.name</dt><dd id="config-name">—</dd></div><div><dt>user.email</dt><dd id="config-email">—</dd></div><div><dt>SSH key</dt><dd id="config-key">—</dd></div></dl><div class="config-foot"><span class="dot"></span><span id="last-checked">Connecting to your machine</span><button class="icon-button" id="refresh" aria-label="Refresh current status"><span data-icon="refresh"></span></button></div></div>
+        </section>
+        <div id="warnings" class="warnings" hidden></div>
+        <div class="section-heading"><div><h2>Your accounts <span id="accounts-total" class="count-pill">0</span></h2><p>A saved identity for every side of your work.</p></div><div class="search"><span data-icon="search"></span><input id="search" type="search" placeholder="Find an account…" aria-label="Find an account"><kbd>/</kbd></div></div>
+        <div class="accounts-grid" id="accounts-grid"></div>
+        <div class="info-strip"><span data-icon="info"></span><p>One click updates your global Git name, email, and SSH key. <strong>Repository settings can override these defaults.</strong></p><button id="learn-more">How it works <span data-icon="arrow-right"></span></button></div>
+        <section class="discovered-section"><div class="section-heading compact"><div><h2>On your machine <span class="text-badge">SSH KEYS</span></h2><p>Found in <code>~/.ssh</code> and your saved accounts.</p></div><button class="text-button" id="view-keys">View all keys <span data-icon="arrow-right"></span></button></div><div id="key-preview"></div></section>
+      </section>
+      <section id="repos-view" hidden>
+        <div class="section-heading compact">
+          <div><h2>Local repositories <span id="repos-total" class="count-pill">0</span></h2><p>Pin identities to specific repositories on your computer so global switches never affect them.</p></div>
+          <div class="heading-actions">
+            <div class="search"><span data-icon="search"></span><input id="search-repos" type="search" placeholder="Filter repositories…" aria-label="Filter repositories"></div>
+            <button class="button secondary" id="scan-repos"><span data-icon="refresh"></span>Rescan</button>
+          </div>
+        </div>
+        <div class="repo-scan-bar"><input id="custom-repo-path" placeholder="Scan custom folder path (e.g. ~/clients or ~/Projects/my-app)" autocomplete="off"><button class="button secondary" id="scan-custom-path"><span data-icon="folder"></span>Scan path</button></div>
+        <div id="repos-grid" class="repos-grid"></div>
+        <div class="info-strip"><span data-icon="shield"></span><p>Pinning an account sets repository-local <code>user.name</code>, <code>user.email</code>, and <code>core.sshCommand</code>. It isolates your commit attribution from any global switches.</p></div>
+      </section>
+      <section id="backups-view" hidden>
+        <div class="section-heading compact"><div><h2>Switch history & snapshots <span id="backups-total" class="count-pill">0</span></h2><p>Automatic snapshots saved before each identity activation or SSH update. Restore any snapshot in one click.</p></div><button class="button secondary" id="refresh-backups"><span data-icon="refresh"></span>Refresh history</button></div>
+        <div id="backups-list" class="backups-list"></div>
+        <div class="info-strip"><span data-icon="info"></span><p>Restoring a snapshot replaces the current global configuration with the saved state. A safety snapshot is taken before restoring.</p></div>
+      </section>
+      <section id="keys-view" hidden><div class="section-heading compact"><div><h2>Available SSH keys</h2><p>Select a key to save an account or activate an identity already linked to it.</p></div><button class="button secondary" id="scan-keys"><span data-icon="refresh"></span>Rescan keys</button></div><div id="key-list"></div><div class="info-strip"><span data-icon="shield"></span><p>Private keys are referenced by their file path. Only public keys can be copied from this app.</p></div></section>
+      <section id="guide-view" hidden><div class="guide-grid"><article class="guide-card"><span class="step-number">01</span><h2>Bring your SSH keys</h2><p>The app discovers private keys in <code>~/.ssh</code>. Add an account to link a key with your Git author name and email. You can also enter a key path elsewhere on your machine.</p><p>Need a new key? Click <strong>Generate SSH key</strong>, choose a filename and email, and optionally protect it with a passphrase. The app creates an Ed25519 key and displays its public key.</p><p>Copy the public key and add it as an <strong>Authentication Key</strong> to the matching account in <a href="https://github.com/settings/ssh/new" target="_blank" rel="noreferrer">GitHub SSH settings ↗</a>.</p></article><article class="guide-card"><span class="step-number">02</span><h2>Save an identity</h2><p>Give it a label like Personal or Work, then save the name and email you want on your commits. Your Git author name can differ from your GitHub username.</p><p>Use a verified GitHub email or the no-reply email shown in your GitHub email settings for commit attribution.</p><p>Saving or editing a profile does not change Git. Click <strong>Activate account</strong> to apply the saved settings.</p></article><article class="guide-card"><span class="step-number">03</span><h2>Switch. Then build.</h2><p>Activating an account updates these global settings together:</p><pre>user.name
+user.email
+core.sshCommand</pre><p>The SSH command selects your key with <code>-i</code> and <code>IdentitiesOnly=yes</code>. Existing SSH configuration still applies and may specify additional keys. The command applies to all Git SSH remotes.</p></article><article class="guide-card"><span class="step-number">↳</span><h2>Know what is active</h2><p>The current status reads global Git settings every 15 seconds. It reports a match only when the name, email, and SSH command all match a saved account.</p><p>HTTPS remotes, GitHub CLI login, and browser sessions are separate. Repository config, conditional includes, and environment variables can override global defaults.</p><p>Use <strong>Get SSH origin</strong> to create an account-specific remote such as <code>git@github-work:owner/repo.git</code>. Encrypted keys may need <code>ssh-add ~/.ssh/your_key</code>. This app shows configured identity, not verified GitHub authentication.</p></article></div><div class="info-strip"><span data-icon="shield"></span><p>A backup of your global Git config is saved before each switch. Removing an account only removes its saved profile; your key file and Git configuration are kept.</p></div></section>
+      <footer class="main-footer"><span>Less account juggling. More shipping.</span><span><span data-icon="lock"></span> Runs on your machine</span></footer>
+    </main>
+  </div>
+  <dialog id="account-dialog"><form id="account-form"><div class="dialog-heading"><div><div class="eyebrow">MAKE YOURSELF AT HOME</div><h2 id="dialog-title">Add an account</h2></div><button type="button" class="icon-button" id="close-dialog" aria-label="Close dialog"><span data-icon="x"></span></button></div><p class="dialog-description">Pair an SSH key with the identity you use for commits.</p><input type="hidden" id="profile-id"><label>Account label<input id="profile-label" required maxlength="200" placeholder="e.g. Personal, Work, Open source" autocomplete="off"></label><div class="form-row"><label>Git author name<input id="profile-name" required maxlength="200" placeholder="Your name" autocomplete="name"></label><label>Git email<input id="profile-email" type="email" required maxlength="200" placeholder="you@example.com" autocomplete="email"></label></div><label>Private SSH key<select id="profile-key"></select></label><label id="custom-key-label" hidden>Key file path<input id="custom-key" placeholder="~/.ssh/id_ed25519_work" autocomplete="off"></label><div class="field-note"><span data-icon="lock"></span>Your private key stays in its existing file.</div><label class="checkbox-container"><input type="checkbox" id="profile-signing"> <span>Enable SSH commit signing (Verified badge on GitHub)</span></label><div class="field-note"><span data-icon="shield"></span>Signs commits with this account's SSH key (Git 2.34+).</div><button type="button" class="text-button" id="generate-for-account"><span data-icon="plus"></span>Generate a new SSH key for this account</button><div class="form-error" id="form-error" role="alert" hidden></div><div class="dialog-actions"><button type="button" class="button secondary" id="cancel-dialog">Cancel</button><button type="submit" class="button primary" id="save-profile"><span data-icon="check"></span>Save account</button></div></form></dialog>
+  <dialog id="delete-dialog"><div class="dialog-heading"><h2>Remove this account?</h2></div><p id="delete-description"></p><p class="dialog-description">The SSH key and current Git configuration will stay as they are.</p><div class="dialog-actions"><button class="button secondary" id="cancel-delete">Keep account</button><button class="button danger" id="confirm-delete">Remove account</button></div></dialog>
+  <dialog id="pin-dialog"><form id="pin-form"><div class="dialog-heading"><div><div class="eyebrow">PIN TO REPOSITORY</div><h2 id="pin-title">Pin account</h2></div><button type="button" class="icon-button" id="close-pin" aria-label="Close pin dialog"><span data-icon="x"></span></button></div><p class="dialog-description" id="pin-description">Select the account to lock into this repository's local Git configuration.</p><input type="hidden" id="pin-repo-path"><label>Account to pin<select id="pin-account-select"></select></label><label class="checkbox-container"><input type="checkbox" id="pin-signing" checked> <span>Enable SSH commit signing in this repo</span></label><div class="dialog-actions"><button type="button" class="button secondary" id="cancel-pin">Cancel</button><button type="submit" class="button primary" id="confirm-pin"><span data-icon="check"></span>Pin to repository</button></div></form></dialog>
+  <dialog id="restore-dialog"><div class="dialog-heading"><h2>Restore this snapshot?</h2></div><p id="restore-description"></p><p class="dialog-description">A safety backup of your current configuration will be taken before restoring.</p><div class="dialog-actions"><button type="button" class="button secondary" id="cancel-restore">Cancel</button><button type="button" class="button primary" id="confirm-restore"><span data-icon="check"></span>Restore snapshot</button></div></dialog>
+  <dialog id="generate-dialog" aria-labelledby="generate-title">
+    <form id="generate-form">
+      <div class="dialog-heading"><div><div class="eyebrow">A FRESH KEY FOR A NEW ACCOUNT</div><h2 id="generate-title">Generate SSH key</h2></div><button type="button" class="icon-button" id="close-generate" aria-label="Close key generation"><span data-icon="x"></span></button></div>
+      <p class="dialog-description">Create an Ed25519 key on this machine, then add its public key to your GitHub account.</p>
+      <label>Key filename<input id="generate-filename" required maxlength="94" pattern="id_[A-Za-z0-9][A-Za-z0-9_.\-]{0,90}" placeholder="id_github_work" autocomplete="off" spellcheck="false"></label>
+      <div class="field-note">Saved in ~/.ssh/ · existing files are never overwritten</div>
+      <label>Account email<input id="generate-email" type="email" required maxlength="200" placeholder="you@example.com" autocomplete="email"></label>
+      <div class="form-row"><label>Passphrase (optional)<input id="generate-passphrase" type="password" minlength="5" maxlength="512" autocomplete="new-password" placeholder="Protect your private key"></label><label>Confirm passphrase<input id="generate-confirm" type="password" maxlength="512" autocomplete="new-password" placeholder="Enter it again"></label></div>
+      <div class="field-note">A passphrase encrypts the private key. Leave both fields empty for no passphrase.</div>
+      <div class="form-error" id="generate-error" role="alert" hidden></div>
+      <div class="dialog-actions"><button type="button" class="button secondary" id="cancel-generate">Cancel</button><button type="submit" class="button primary" id="submit-generate"><span data-icon="key"></span>Generate key</button></div>
+    </form>
+  </dialog>
+  <dialog id="public-key-dialog" aria-labelledby="public-key-title">
+    <div class="dialog-heading"><div><div class="eyebrow">READY FOR GITHUB</div><h2 id="public-key-title">Add your public key</h2></div><button class="icon-button" id="close-public-key" aria-label="Close public key"><span data-icon="x"></span></button></div>
+    <p class="dialog-description" id="public-key-description"></p>
+    <label for="public-key-text">Public key · safe to add to GitHub</label><textarea id="public-key-text" readonly rows="4" spellcheck="false"></textarea>
+    <div class="public-key-actions"><button class="button secondary" id="copy-public-key"><span data-icon="copy"></span>Copy public key</button><span id="public-key-copy-status" role="status"></span></div>
+    <div class="public-key-meta"><span id="public-key-path"></span><span id="public-key-fingerprint"></span></div>
+    <ol class="github-steps"><li>Sign in to the GitHub account this key belongs to.</li><li>Open <a href="https://github.com/settings/ssh/new" target="_blank" rel="noreferrer">GitHub’s New SSH key page ↗</a>.</li><li>Enter a title, choose <strong>Authentication Key</strong>, paste the public key above, and click <strong>Add SSH key</strong>.</li></ol>
+    <p class="field-note">GitHub registration is completed on GitHub. Your private key stays on this computer.</p>
+    <div class="dialog-actions"><button class="button secondary" id="done-public-key">Done</button><button class="button primary" id="link-public-key"><span data-icon="plus"></span>Link an account</button></div>
+  </dialog>
+  <dialog id="origin-dialog" aria-labelledby="origin-title">
+    <form id="origin-form">
+      <div class="dialog-heading"><div><div class="eyebrow">A REMOTE FOR THIS ACCOUNT</div><h2 id="origin-title">Get SSH origin</h2></div><button type="button" class="icon-button" id="close-origin" aria-label="Close origin builder"><span data-icon="x"></span></button></div>
+      <p class="dialog-description">Choose the repository path, then copy the origin URL or the complete setup for this account.</p>
+      <div class="form-row"><label>Account<select id="origin-account"></select></label><label>Workflow<select id="origin-workflow"><option value="init">Initialize current folder</option><option value="clone">Clone an existing repository</option></select></label></div>
+      <div class="form-row"><label>Repository owner<input id="origin-owner" required maxlength="100" pattern="[A-Za-z0-9][A-Za-z0-9_.-]*" placeholder="xyz" autocomplete="off" spellcheck="false"></label><label>Repository name<input id="origin-repository" required maxlength="100" pattern="[A-Za-z0-9][A-Za-z0-9_.-]*" placeholder="testing" autocomplete="off" spellcheck="false"></label></div>
+      <div class="origin-preview"><div class="origin-preview-heading"><span>ACCOUNT-SPECIFIC SSH ORIGIN</span><span class="origin-account-chip" id="origin-account-chip"></span></div><code id="origin-url">git@github-account:OWNER/REPOSITORY.git</code><div class="origin-preview-actions"><button type="button" class="button secondary" id="copy-origin"><span data-icon="copy"></span>Copy origin</button><span id="origin-copy-status" role="status"></span></div></div>
+      <div class="setup-preview"><div class="origin-preview-heading"><span id="origin-setup-label">PASTE DURING INIT / SETUP</span><span data-icon="terminal"></span></div><pre id="origin-setup">git init&#10;git config --local user.name 'Your Name'&#10;git config --local user.email 'you@example.com'&#10;git config --local core.sshCommand 'ssh -i ~/.ssh/your_key -o IdentitiesOnly=yes'&#10;git remote add origin git@github-account:OWNER/REPOSITORY.git</pre><button type="button" class="button secondary" id="copy-origin-setup"><span data-icon="copy"></span><span id="copy-origin-setup-label">Copy full setup</span></button><span id="origin-setup-status" role="status"></span></div>
+      <p class="field-note"><span data-icon="shield"></span>The host alias identifies the selected account and maps to GitHub in <code>~/.ssh/config</code>. The full setup also pins this repository’s author and SSH key, so later global account switches cannot change it.</p>
+      <div class="dialog-actions"><button type="button" class="button secondary" id="done-origin">Done</button></div>
+    </form>
+  </dialog>
+  <div id="toast" role="status" hidden></div>
+</body>
+</html>
